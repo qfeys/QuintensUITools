@@ -5,6 +5,7 @@
     /// </summary>
     /// <typeparam name="T1"></typeparam>
     /// <typeparam name="T2"></typeparam>
+    [System.Serializable]
     public class Tuple<T1, T2>
     {
         public T1 Item1;

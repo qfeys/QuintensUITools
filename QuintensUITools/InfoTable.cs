@@ -82,9 +82,9 @@ namespace QuintensUITools
                 transform.GetChild(i).GetChild(1).GetComponent<Text>().text = info[i].Item2;
             }
             if (i == 0) i++;
-            while (transform.GetChild(1).childCount < i)
+            while (transform.childCount < i)
             {
-                transform.GetChild(1).GetChild(i).gameObject.SetActive(false);
+                transform.GetChild(i).gameObject.SetActive(false);
                 i++;
             }
         }

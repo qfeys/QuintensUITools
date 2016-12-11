@@ -42,7 +42,6 @@ namespace QuintensUITools
         public void Start()
         {
             standardHeight = ((RectTransform)gameObject.transform).rect.height;
-            Debug.Log(standardHeight);
             var VLayGr = gameObject.GetComponent<VerticalLayoutGroup>();
             if(VLayGr == null)
                 VLayGr = gameObject.AddComponent<VerticalLayoutGroup>();
