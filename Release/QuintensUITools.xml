@@ -1,0 +1,273 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>QuintensUITools</name>
+    </assembly>
+    <members>
+        <member name="T:QuintensUITools.Dragable">
+            <summary>
+            A simple monobehaviour that allow you to drag a ui element (like a panel)
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.Graphics.SetPath(System.String)">
+            <summary>
+            Sets the path of the graphics library.
+            Defaults to @"Mods\"
+            Will search for .png in all underlying directories
+            Call this before LoadGraphics()
+            </summary>
+            <param name="p"></param>
+        </member>
+        <member name="M:QuintensUITools.Graphics.GetSprite(System.String)">
+            <summary>
+            Returns a sprite from a png in the graphics folder.
+            </summary>
+            <param name="name">The name of the file without the extension</param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.Graphics.Color_.FromTemperature(System.Int32)">
+            <summary>
+            Transforms a temperature in K to its black body color
+            </summary>
+            <param name="temperature"></param>
+            <returns></returns>
+        </member>
+        <member name="T:QuintensUITools.InfoTable">
+            <summary>
+            This class allows for the quick creation of a multi collum info panel that can be easely updated.
+            To use this, call one of the Create() functions. The amount of things that will be updated depends on which
+            of the create functions you called.
+            To set the info, call 'SetInfo' to change all the information, or 'AddInfo' to add to existion information.
+            Make sure to always call 'Redraw()' after changing the information. This should also dynamically deactivate unused lines.
+            'FullRedraw()' can be used to delete all contets and recreate all gameobjects.
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.Create(UnityEngine.Transform,System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Collections.Generic.List{QuintensUITools.TextRef},System.Int32,QuintensUITools.TextRef)">
+            <summary>
+            Use this constructor if you want to make a multi column table where the number of elements is fixed
+            </summary>
+            <param name="parent"></param>
+            <param name="info">The tuples in this list are the entries. The entries of the second List should return an object on which ToString() will be called.</param>
+            <param name="width"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.Create(UnityEngine.Transform,System.Func{System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}}},System.Int32,System.Collections.Generic.List{QuintensUITools.TextRef},System.Int32,QuintensUITools.TextRef)">
+            <summary>
+            Use this constructor if you want to make a multi column table where the number of elements is variable
+            BEWARE: this is badly optimised at the moment.
+            </summary>
+            <param name="parent"></param>
+            <param name="script">This function must return the list with entries. The tuples in this list are the entries. The entries of the second List should return an object on which ToString() will be called.</param>
+            <param name="width"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.Create``1(UnityEngine.Transform,System.Collections.Generic.List{``0},System.Func{``0,System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Collections.Generic.List{QuintensUITools.TextRef},System.Int32,QuintensUITools.TextRef)">
+            <summary>
+            
+            Use this constructor if you want to make a multi column table where the number of elements is fixed
+            and where the data in the table is remebered, for interactable tables
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parent"></param>
+            <param name="dataList">This is the list with the data in the table</param>
+            <param name="lineScript">This function transforms the data entries into a line of TextRefs</param>
+            <param name="width"></param>
+            <param name="headers"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.Create``1(UnityEngine.Transform,System.Func{System.Collections.Generic.List{``0}},System.Func{``0,System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Collections.Generic.List{QuintensUITools.TextRef},System.Int32,QuintensUITools.TextRef)">
+            <summary>
+            
+            Use this constructor if you want to make a multi column table where the number of elements is variable
+            and where the data in the table is remebered, for interactable tables
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parent"></param>
+            <param name="listScript">This script creates the data in the table</param>
+            <param name="lineScript">This function transforms the data entries into a line of TextRefs</param>
+            <param name="width"></param>
+            <param name="headers"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.SetInfo(System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}})">
+            <summary>
+            Removes the info from the table and sets new info.
+            BEWARE: make sure to call Redraw() after setting the info
+            </summary>
+            <param name="newInfo">The tuples in this list are the entries. The entries of the second List should return an object on which ToString() will be called.</param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.AddInfo(System.Collections.Generic.List{QuintensUITools.TextRef})">
+            <summary>
+            Adds one new line to the info
+            BEWARE: make sure to call Redraw() after setting the info
+            </summary>
+            <param name="newInfo">The tuples is the entry. The entries of the second List should return an object on which ToString() will be called.</param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.MultiColumnPassive.#ctor(UnityEngine.Transform,System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Int32,QuintensUITools.TextRef,System.Collections.Generic.List{QuintensUITools.TextRef})">
+            <summary>
+            Use this constructor if you want to make a 2 column table where the number of elements is fixed
+            </summary>
+            <param name="parent"></param>
+            <param name="info">The tuples in this list are the entries. The second item is the ToString() of whatever object is returned by the second function.</param>
+            <param name="width"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.MultiColumnPassiveMemory`1.#ctor(UnityEngine.Transform,System.Collections.Generic.List{`0},System.Func{`0,System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Int32,QuintensUITools.TextRef,System.Collections.Generic.List{QuintensUITools.TextRef})">
+            <summary>
+            Use this constructor if you want to make a 2 column table where the number of elements is fixed
+            </summary>
+            <param name="parent"></param>
+            <param name="info">The tuples in this list are the entries. The second item is the ToString() of whatever object is returned by the second function.</param>
+            <param name="width"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.MultiColumnActive.#ctor(UnityEngine.Transform,System.Func{System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}}},System.Int32,System.Int32,QuintensUITools.TextRef,System.Collections.Generic.List{QuintensUITools.TextRef})">
+            <summary>
+            Use this constructor if the number of elements in the table is variable.
+            BEWARE: this is badly optimised at the moment.
+            </summary>
+            <param name="parent"></param>
+            <param name="script">This function must return the list with entries. The tuples in this list are the entries. The second item is the ToString() of whatever object is returned by the second function.</param>
+            <param name="width"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.MultiColumnActiveMemory`1.#ctor(UnityEngine.Transform,System.Func{System.Collections.Generic.List{`0}},System.Func{`0,System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Int32,QuintensUITools.TextRef,System.Collections.Generic.List{QuintensUITools.TextRef})">
+            <summary>
+            Use this constructor if the number of elements in the table is variable.
+            BEWARE: this is badly optimised at the moment.
+            </summary>
+            <param name="parent"></param>
+            <param name="script">This function must return the list with entries. The tuples in this list are the entries. The second item is the ToString() of whatever object is returned by the second function.</param>
+            <param name="width"></param>
+            <param name="fontSize"></param>
+            <param name="title"></param>
+        </member>
+        <member name="T:QuintensUITools.Localisation">
+            <summary>
+            This is the class that takes care of all Localisation files.
+            At the moment English is the only supported language.
+            Take care that all files are in a folder named "Localisation".
+            Take care the name of the file ends with "eng.txt".
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.Localisation.SetPath(System.String)">
+            <summary>
+            Sets the path of the localisation library.
+            Defaults to @"Mods\"
+            Will search for folders named Localisation in all underlying directories
+            Call this before Load()
+            </summary>
+            <param name="p"></param>
+        </member>
+        <member name="T:QuintensUITools.TabbedWindow">
+            <summary>
+            This class will generate several unity objects that together will form a window with tabs
+            Make sure you have the images "tab_image_low" and "tab_image_high" in the appropriate folders
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.TabbedWindow.SetTab(System.Int32)">
+            <summary>
+            Sets the tab of the window on the page with the given rank. If the window is minimised, 
+            this will also maximise the window.
+            </summary>
+            <param name="n"></param>
+        </member>
+        <member name="M:QuintensUITools.TabbedWindow.MinimiseWindow">
+            <summary>
+            This will minimise the window
+            </summary>
+        </member>
+        <member name="P:QuintensUITools.TextBox.gameObject">
+            <summary>
+            The gameobject that contains the text.
+            WARNING: Do not attach a layout element to this gameobject. If you need one, use a container
+            as parent for the TextBox.
+            </summary>
+        </member>
+        <member name="T:QuintensUITools.TextRef">
+            <summary>
+            Text reference class. This is a container class for all text that has to be send to
+            the UI system. This can be a simple string, a reference to the localisation file or
+            a reference to a value somewhere.
+            You can use a TextRef implicitly as a string.
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.TextRef.Create(System.String,System.Boolean)">
+            <summary>
+            Create a new text reference that can store a string which can be read from the localisation files.
+            </summary>
+            <param name="text"></param>
+            <param name="localised">Whether or not this value is a key in the localisation files.</param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.TextRef.Create(System.String,System.String,System.Boolean)">
+            <summary>
+            Create a new text reference that can store a string and an alternative string which can be read
+            from the localisation files.
+            </summary>
+            <param name="text"></param>
+            <param name="altText">This is mainly used for mouseover text.</param>
+            <param name="localised">Whether or not this value is a key in the localisation files.</param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.TextRef.Create(System.String,System.Func{System.Object},System.Boolean)">
+            <summary>
+            Create a new text reference that can store a string and an alternative string which can be read
+            from the localisation files.
+            </summary>
+            <param name="text"></param>
+            <param name="altRef">This is mainly used for mouseover text.</param>
+            <param name="localised">Whether or not this value is a key in the localisation files.</param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.TextRef.Create(System.Func{System.Object})">
+            <summary>
+            Create a new text reference that will remember the reference to a value in
+            the program. Refer to the object, not to the ToString of the object. The
+            TextRef object will make sure numbers are properly formatted.
+            </summary>
+            <param name="reference"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.TextRef.Create(System.Func{System.Object},System.String)">
+            <summary>
+            Create a new text reference that will remember the reference to a value in
+            the program. Refer to the object, not to the ToString of the object. The
+            TextRef object will make sure numbers are properly formatted. This version
+            of Create can also link an alternative text.
+            </summary>
+            <param name="reference"></param>
+            <param name="altText"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.TextRef.Create(System.Func{System.Object},System.Func{System.Object})">
+            <summary>
+            Create a new text reference that will remember the reference to a value in
+            the program. Refer to the object, not to the ToString of the object. The
+            TextRef object will make sure numbers are properly formatted. This version
+            of Create can also link an alternative text.
+            </summary>
+            <param name="reference"></param>
+            <param name="altRef"></param>
+            <returns></returns>
+        </member>
+        <member name="M:QuintensUITools.TextRef.ToSI(System.Double,System.String)">
+            <summary>
+            Found on stackoverflow
+            https://stackoverflow.com/questions/12181024/formatting-a-number-with-a-metric-prefix
+            </summary>
+            <param name="d"></param>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

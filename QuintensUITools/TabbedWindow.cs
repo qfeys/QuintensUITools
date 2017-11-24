@@ -6,82 +6,67 @@ using UnityEngine.UI;
 namespace QuintensUITools
 {
     /// <summary>
-    /// Appely this on a Unity ui object (like a panel) to transform it into a panel with tabs. Ener the names of the tabs into 'TabNames'
-    /// and a prefab of the subwindows for each tab into 'TabContent'.
-    /// 'ExampleText' should be a gameobject with a 'Text' component. This will be used as a template for the tab names.
-    /// 'TabImageHigh' and 'TabImageLow' are teh background of the tab titles when they are selected and when not.
-    /// 'CanBeMinimised' alows for the minimalisation of the window.
+    /// This class will generate several unity objects that together will form a window with tabs
+    /// Make sure you have the images "tab_image_low" and "tab_image_high" in the appropriate folders
     /// </summary>
-    class TabbedWindow : MonoBehaviour
+    class TabbedWindow
     {
-        public bool CanBeMinimised;
-        public Sprite TabImageLow;
-        public Sprite TabImageHigh;
-        public GameObject ExampleText;
-        public List<string> TabNames;
-        public List<GameObject> TabContent;
+        bool canBeMinimised;
 
-        List<GameObject> buttons;
-        List<GameObject> windows;
-        float standardHeight;
+        List<Tuple<GameObject, GameObject>> windows;
         bool isMinimised = false;
-        
+        Vector2 size;
+        int tabFontSize;
 
-        public void Awake()
-        {
-            if (TabNames.Count != TabContent.Count)
-                throw new ArgumentException("You gave " + TabNames.Count + " tab names and " + TabContent.Count + " tab contents.");
-            if (ExampleText.GetComponentInChildren<Text>() == null)
-                throw new ArgumentException("You did not include a Text component in your exampleText.");
-            //if (tabPrefab.GetComponentInChildren<Button>() == null)
-            //    throw new ArgumentException("You did not include a Button component in your tab prefab.");
-            //if (tabPrefab.GetComponentInChildren<LayoutElement>() == null)
-            //    throw new ArgumentException("You did not include a LayoutElement component in your tab prefab.");
-        }
+        GameObject go;
+        public GameObject gameobject { get { return go; } }
+        public RectTransform transform { get { return go.transform as RectTransform; } }
 
-        public void Start()
+        public TabbedWindow(Transform parent, Vector2 size, List<Tuple<TextRef, GameObject>> tabs, int tabFontSize = 12, bool canBeMinimised = true)
         {
-            standardHeight = ((RectTransform)gameObject.transform).rect.height;
-            var VLayGr = gameObject.GetComponent<VerticalLayoutGroup>();
-            if(VLayGr == null)
-                VLayGr = gameObject.AddComponent<VerticalLayoutGroup>();
+            go = new GameObject("TabWindow", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            this.size = size;
+            this.canBeMinimised = canBeMinimised;
+            this.tabFontSize = tabFontSize;
+            ((RectTransform)go.transform).sizeDelta = size;
+            var VLayGr = go.AddComponent<VerticalLayoutGroup>();
             VLayGr.childForceExpandHeight = false;
             VLayGr.childForceExpandWidth = false;
-            GameObject buttonLine = new GameObject("Tab Line");
-            buttonLine.transform.parent = transform;
-            var LOE = buttonLine.AddComponent<LayoutElement>();
-            LOE.minHeight = ExampleText.GetComponent<Text>().fontSize * 3 / 2;
-            LOE.flexibleHeight = 0;
-            LOE.flexibleWidth = 1;
+            GameObject buttonLine = new GameObject("Tab Line", typeof(RectTransform));
+            buttonLine.transform.SetParent(go.transform, false);
+            var LayEl = buttonLine.AddComponent<LayoutElement>();
+            LayEl.minHeight = tabFontSize * 3 / 2 + 5;
+            LayEl.flexibleHeight = 0;
+            LayEl.flexibleWidth = 1;
             var HLayGr = buttonLine.AddComponent<HorizontalLayoutGroup>();
             HLayGr.childForceExpandHeight = false;
             HLayGr.childForceExpandWidth = false;
-            GameObject mainWindow = new GameObject("Main Window");
-            mainWindow.transform.parent = transform;
+            HLayGr.padding = new RectOffset(5, 0, 3, 2);
+            GameObject mainWindow = new GameObject("Main Window", typeof(RectTransform));
+            mainWindow.transform.SetParent(go.transform, false);
             mainWindow.AddComponent<LayoutElement>().flexibleHeight = 1;
-            mainWindow.AddComponent<HorizontalLayoutGroup>();
+            mainWindow.AddComponent<HorizontalLayoutGroup>();   // used to strech the underlying windows
 
-            buttons = new List<GameObject>();
-            windows = new List<GameObject>();
-            for (int i = 0; i < TabNames.Count; i++)
+            windows = new List<Tuple<GameObject, GameObject>>();
+            for (int i = 0; i < tabs.Count; i++)
             {
-                GameObject tab = new GameObject("Tab");
+                GameObject tab = new GameObject("Tab", typeof(RectTransform));
                 tab.transform.SetParent(buttonLine.transform);
                 Image img = tab.AddComponent<Image>();
-                img.sprite = TabImageLow;
+                img.sprite = Graphics.GetSprite("tab_image_low");
                 img.raycastTarget = true;
                 img.type = Image.Type.Sliced;
                 img.fillCenter = true;
 
-                GameObject text = Instantiate(ExampleText);
-                text.transform.SetParent(tab.transform,false);
-                Text t = text.GetComponent<Text>();
-                t.text = TabNames[i];
-                float width = t.preferredWidth + t.fontSize;
-                float height = t.fontSize * 3 / 2;
+                TextBox text = new TextBox(tab.transform, tabs[i].Item1, tabFontSize);
+                text.transform.anchoredPosition += new Vector2(5, 0);
+
+                tab.AddComponent<LayoutElement>().flexibleHeight = 1;
+                tab.GetComponent<LayoutElement>().preferredWidth = text.Width + tabFontSize;
 
                 int j = i;
-                if (CanBeMinimised)
+                if (canBeMinimised)
                 {
                     tab.AddComponent<Button>().onClick.AddListener(() => { MaximiseWindow(); SetTab(j); });
                 }
@@ -89,76 +74,77 @@ namespace QuintensUITools
                 {
                     tab.AddComponent<Button>().onClick.AddListener(() => SetTab(j));
                 }
-                buttons.Add(tab);
 
-                tab.AddComponent<LayoutElement>().flexibleHeight = 1;
-                tab.GetComponent<LayoutElement>().preferredWidth = width;
-
-                GameObject window = Instantiate(TabContent[i]);
+                GameObject window = tabs[i].Item2;
                 window.transform.SetParent(mainWindow.transform);
                 window.SetActive(false);
-                windows.Add(window);
+                windows.Add(new Tuple<GameObject, GameObject>(tab, window));
             }
-            if (CanBeMinimised)
+            if (canBeMinimised)
             {
-                GameObject tab = new GameObject("Tab");
+                GameObject tab = new GameObject("Tab", typeof(RectTransform));
                 tab.transform.SetParent(buttonLine.transform);
                 Image img = tab.AddComponent<Image>();
-                img.sprite = TabImageLow;
+                img.sprite = Graphics.GetSprite("tab_image_low");
                 img.raycastTarget = true;
                 img.type = Image.Type.Sliced;
                 img.fillCenter = true;
 
-                GameObject text = Instantiate(ExampleText);
-                text.transform.SetParent(tab.transform, false);
-                Text t = text.GetComponent<Text>();
-                t.text = "X";
-                float width = t.preferredWidth + t.fontSize;
-                float height = t.fontSize * 3 / 2;
-                
-                tab.AddComponent<Button>().onClick.AddListener(() => { SetTab(TabNames.Count); MinimiseWindow(); });
-                buttons.Add(tab);
+                TextBox text = new TextBox(tab.transform, TextRef.Create("X", false), tabFontSize);
+                ((RectTransform)text.gameObject.transform).anchoredPosition += new Vector2(5, 0);
 
                 tab.AddComponent<LayoutElement>().flexibleHeight = 1;
-                tab.GetComponent<LayoutElement>().preferredWidth = width;
+                tab.GetComponent<LayoutElement>().preferredWidth = text.gameObject.GetComponent<Text>().preferredWidth + tabFontSize;
+                int a = windows.Count;
+                tab.AddComponent<Button>().onClick.AddListener(() => { SetTab(a); MinimiseWindow(); });
 
-                GameObject window = new GameObject();
+                GameObject window = new GameObject("Null Window", typeof(RectTransform));
                 window.transform.SetParent(mainWindow.transform);
                 window.SetActive(false);
-                windows.Add(window);
+                windows.Add(new Tuple<GameObject, GameObject>(tab, window));
             }
-            SetTab(0);
+            if (canBeMinimised) MinimiseWindow();
+            else SetTab(0);
         }
 
-        private void SetTab(int n)
+        /// <summary>
+        /// Sets the tab of the window on the page with the given rank. If the window is minimised, 
+        /// this will also maximise the window.
+        /// </summary>
+        /// <param name="n"></param>
+        public void SetTab(int n)
         {
-            for (int i = 0; i < TabNames.Count; i++)
+            for (int i = 0; i < windows.Count; i++)
             {
-                if(i != n)
+                if (i != n)
                 {
-                    if (windows[i].activeSelf)
+                    if (windows[i].Item2.activeSelf)
                     {
-                        windows[i].SetActive(false);
-                        buttons[i].GetComponent<Image>().sprite = TabImageLow;
+                        windows[i].Item2.SetActive(false);
+                        windows[i].Item1.GetComponent<Image>().sprite = Graphics.GetSprite("tab_image_low");
                     }
                 }
             }
-            if (windows[n].activeSelf == false)
+            if (windows[n].Item2.activeSelf == false)
             {
-                windows[n].SetActive(true);
-                buttons[n].GetComponent<Image>().sprite = TabImageHigh;
+                windows[n].Item2.SetActive(true);
+                windows[n].Item1.GetComponent<Image>().sprite = Graphics.GetSprite("tab_image_high");
             }
 
         }
 
-        private void MinimiseWindow()
+        /// <summary>
+        /// This will minimise the window
+        /// </summary>
+        public void MinimiseWindow()
         {
-            if(isMinimised == false)
+            if (isMinimised == false)
             {
-                ((RectTransform)gameObject.transform).sizeDelta = new Vector2(
-                    ((RectTransform)gameObject.transform).rect.width,
-                    ((RectTransform)transform.GetChild(0).transform).rect.height);
+                ((RectTransform)go.transform).sizeDelta = new Vector2(
+                    ((RectTransform)go.transform).rect.width,
+                     tabFontSize * 3 / 2.0f + 6);
                 isMinimised = true;
+                SetTab(windows.Count - 1);
             }
         }
 
@@ -166,11 +152,21 @@ namespace QuintensUITools
         {
             if (isMinimised == true)
             {
-                ((RectTransform)gameObject.transform).sizeDelta = new Vector2(
-                    ((RectTransform)gameObject.transform).rect.width,
-                    standardHeight);
+                ((RectTransform)go.transform).sizeDelta = size;
                 isMinimised = false;
             }
+        }
+
+        internal GameObject GetActiveTab()
+        {
+            for (int i = 0; i < windows.Count; i++)
+            {
+                if (windows[i].Item2.activeSelf)
+                {
+                    return windows[i].Item2;
+                }
+            }
+            return null;
         }
     }
 }
