@@ -10,11 +10,14 @@ namespace QuintensUITools
     /// Take care that all files are in a folder named "Localisation".
     /// Take care the name of the file ends with "eng.txt".
     /// </summary>
-    static class Localisation
+    static public class Localisation
     {
         static Dictionary<string, string> eng = new Dictionary<string, string>();
         static string path = @"Mods\";
 
+        /// <summary>
+        /// Loads in all the localisation files in the path (see also SetPath())
+        /// </summary>
         public static void Load()
         {
             List<string> mods = Directory.EnumerateDirectories(path).ToList();
@@ -65,6 +68,11 @@ namespace QuintensUITools
             path = p;
         }
 
+        /// <summary>
+        /// Get a string from the localisation files, according to the string id
+        /// </summary>
+        /// <param name="textID"></param>
+        /// <returns></returns>
         public static string GetText(string textID)
         {
             if (eng.ContainsKey(textID))

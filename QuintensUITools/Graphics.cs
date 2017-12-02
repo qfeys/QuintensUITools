@@ -5,7 +5,10 @@ using UnityEngine;
 
 namespace QuintensUITools
 {
-    static class Graphics
+    /// <summary>
+    /// This class handels loading graphics
+    /// </summary>
+    static public class Graphics
     {
         static Dictionary<string, Texture2D> dict;
         static string path = @"Mods\";
@@ -28,6 +31,9 @@ namespace QuintensUITools
             standardFont = font;
         }
 
+        /// <summary>
+        /// Loads in all the graphics files in the path (see also SetPath())
+        /// </summary>
         public static void LoadGraphics()
         {
             string[] allPaths = Directory.GetFiles(path, "*.png", SearchOption.AllDirectories);
@@ -44,6 +50,10 @@ namespace QuintensUITools
             Debug.Log("Loaded " + allPaths.Length + " graphics.");
         }
 
+        /// <summary>
+        /// Get the default fond, see also SetDefaultFont()
+        /// </summary>
+        /// <returns></returns>
         public static Font GetStandardFont()
         {
             if(standardFont != null)
@@ -69,10 +79,19 @@ namespace QuintensUITools
             return Resources.Load<Sprite>(@"Graphics\Small button");
         }
 
+        /// <summary>
+        /// A custom class for color handeling
+        /// </summary>
         public static class Color_
         {
-            public static Color text;
-            public static Color activeText;
+            /// <summary>
+            /// Default text color
+            /// </summary>
+            public static Color text { get; private set; }
+            /// <summary>
+            /// Default color for selected text
+            /// </summary>
+            public static Color activeText { get; private set; }
 
             static Color_()
             {
@@ -80,11 +99,19 @@ namespace QuintensUITools
                 activeText = new Color(.5f, .5f, 0);
             }
 
+            /// <summary>
+            /// Sets the default text color
+            /// </summary>
+            /// <param name="col"></param>
             public static void SetTextColor(Color col)
             {
                 text = col;
             }
 
+            /// <summary>
+            /// Sets the default color for selected text
+            /// </summary>
+            /// <param name="col"></param>
             public static void SetActiveTextColor(Color col)
             {
                 activeText = col;

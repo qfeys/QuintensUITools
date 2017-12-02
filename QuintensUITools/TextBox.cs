@@ -5,6 +5,9 @@ using System;
 
 namespace QuintensUITools
 {
+    /// <summary>
+    /// Creates a UI element that holds some text. Uses TextRef.
+    /// </summary>
     public class TextBox
     {
         public TextRef Text;

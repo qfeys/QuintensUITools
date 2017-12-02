@@ -9,6 +9,11 @@
             A simple monobehaviour that allow you to drag a ui element (like a panel)
             </summary>
         </member>
+        <member name="T:QuintensUITools.Graphics">
+            <summary>
+            This class handels loading graphics
+            </summary>
+        </member>
         <member name="M:QuintensUITools.Graphics.SetPath(System.String)">
             <summary>
             Sets the path of the graphics library.
@@ -18,12 +23,50 @@
             </summary>
             <param name="p"></param>
         </member>
+        <member name="M:QuintensUITools.Graphics.LoadGraphics">
+            <summary>
+            Loads in all the graphics files in the path (see also SetPath())
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.Graphics.GetStandardFont">
+            <summary>
+            Get the default fond, see also SetDefaultFont()
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:QuintensUITools.Graphics.GetSprite(System.String)">
             <summary>
             Returns a sprite from a png in the graphics folder.
             </summary>
             <param name="name">The name of the file without the extension</param>
             <returns></returns>
+        </member>
+        <member name="T:QuintensUITools.Graphics.Color_">
+            <summary>
+            A custom class for color handeling
+            </summary>
+        </member>
+        <member name="P:QuintensUITools.Graphics.Color_.text">
+            <summary>
+            Default text color
+            </summary>
+        </member>
+        <member name="P:QuintensUITools.Graphics.Color_.activeText">
+            <summary>
+            Default color for selected text
+            </summary>
+        </member>
+        <member name="M:QuintensUITools.Graphics.Color_.SetTextColor(UnityEngine.Color)">
+            <summary>
+            Sets the default text color
+            </summary>
+            <param name="col"></param>
+        </member>
+        <member name="M:QuintensUITools.Graphics.Color_.SetActiveTextColor(UnityEngine.Color)">
+            <summary>
+            Sets the default color for selected text
+            </summary>
+            <param name="col"></param>
         </member>
         <member name="M:QuintensUITools.Graphics.Color_.FromTemperature(System.Int32)">
             <summary>
@@ -159,6 +202,11 @@
             Take care the name of the file ends with "eng.txt".
             </summary>
         </member>
+        <member name="M:QuintensUITools.Localisation.Load">
+            <summary>
+            Loads in all the localisation files in the path (see also SetPath())
+            </summary>
+        </member>
         <member name="M:QuintensUITools.Localisation.SetPath(System.String)">
             <summary>
             Sets the path of the localisation library.
@@ -167,6 +215,13 @@
             Call this before Load()
             </summary>
             <param name="p"></param>
+        </member>
+        <member name="M:QuintensUITools.Localisation.GetText(System.String)">
+            <summary>
+            Get a string from the localisation files, according to the string id
+            </summary>
+            <param name="textID"></param>
+            <returns></returns>
         </member>
         <member name="T:QuintensUITools.TabbedWindow">
             <summary>
@@ -184,6 +239,11 @@
         <member name="M:QuintensUITools.TabbedWindow.MinimiseWindow">
             <summary>
             This will minimise the window
+            </summary>
+        </member>
+        <member name="T:QuintensUITools.TextBox">
+            <summary>
+            Creates a UI element that holds some text. Uses TextRef.
             </summary>
         </member>
         <member name="P:QuintensUITools.TextBox.gameObject">
