@@ -66,7 +66,7 @@ namespace QuintensUITools
         /// </summary>
         /// <param name="name">The name of the file without the extension</param>
         /// <returns></returns>
-        internal static Sprite GetSprite(string name)
+        public static Sprite GetSprite(string name)
         {
             if (dict.ContainsKey(name))
             {
@@ -122,7 +122,7 @@ namespace QuintensUITools
             /// </summary>
             /// <param name="temperature"></param>
             /// <returns></returns>
-            internal static Color FromTemperature(int temperature)
+            public static Color FromTemperature(int temperature)
             {
                 float red = 0;
                 if (temperature <= 6600)

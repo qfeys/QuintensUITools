@@ -157,7 +157,7 @@ namespace QuintensUITools
             }
         }
 
-        internal GameObject GetActiveTab()
+        public GameObject GetActiveTab()
         {
             for (int i = 0; i < windows.Count; i++)
             {
