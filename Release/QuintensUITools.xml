@@ -138,6 +138,19 @@
             <param name="title"></param>
             <returns></returns>
         </member>
+        <member name="M:QuintensUITools.InfoTable.SetColumnWidths(System.Collections.Generic.List{System.Single})">
+            <summary>
+            Gives the widths that the different collums should have. Follow this function with a Redraw()
+            </summary>
+            <param name="widths"></param>
+        </member>
+        <member name="M:QuintensUITools.InfoTable.RetrieveHighlight``1">
+            <summary>
+            Retrieve the highlighted line of a table where highlighting is enabled
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="M:QuintensUITools.InfoTable.SetInfo(System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}})">
             <summary>
             Removes the info from the table and sets new info.
@@ -152,6 +165,11 @@
             </summary>
             <param name="newInfo">The tuples is the entry. The entries of the second List should return an object on which ToString() will be called.</param>
         </member>
+        <member name="T:QuintensUITools.InfoTable.ActiveInfoTable">
+            <summary>
+            The monobehaviour component of the InfoTable class. Please don't touch this.
+            </summary>
+        </member>
         <member name="M:QuintensUITools.InfoTable.MultiColumnPassive.#ctor(UnityEngine.Transform,System.Collections.Generic.List{System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Int32,QuintensUITools.TextRef,System.Collections.Generic.List{QuintensUITools.TextRef})">
             <summary>
             Use this constructor if you want to make a 2 column table where the number of elements is fixed
@@ -164,7 +182,7 @@
         </member>
         <member name="M:QuintensUITools.InfoTable.MultiColumnPassiveMemory`1.#ctor(UnityEngine.Transform,System.Collections.Generic.List{`0},System.Func{`0,System.Collections.Generic.List{QuintensUITools.TextRef}},System.Int32,System.Int32,QuintensUITools.TextRef,System.Collections.Generic.List{QuintensUITools.TextRef})">
             <summary>
-            Use this constructor if you want to make a 2 column table where the number of elements is fixed
+            Use this constructor if you want to make a multi column table where the number of elements is fixed
             </summary>
             <param name="parent"></param>
             <param name="info">The tuples in this list are the entries. The second item is the ToString() of whatever object is returned by the second function.</param>

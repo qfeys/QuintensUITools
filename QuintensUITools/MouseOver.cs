@@ -35,7 +35,7 @@ namespace QuintensUITools
             tr2.anchoredPosition = new Vector2(0, 0);
             tx = go2.AddComponent<Text>();
             tx.font = Graphics.GetStandardFont();
-            tx.fontSize = 8;
+            tx.fontSize = 12;
             tx.color = Graphics.Color_.text;
             tx.alignment = TextAnchor.UpperLeft;
 

@@ -23,6 +23,7 @@ namespace QuintensUITools
         public RectTransform transform { get { return go.transform as RectTransform; } }
         int fontSize;
         protected List<TextRef> headers;
+        protected List<float> widths;
         bool highlightLines = true;
         GameObject highlightedLine;
         List<Action> highlightChangeCallbacks;
@@ -107,6 +108,58 @@ namespace QuintensUITools
 
         abstract public void Redraw();
 
+        /// <summary>
+        /// Gives the widths that the different collums should have. Follow this function with a Redraw()
+        /// </summary>
+        /// <param name="widths"></param>
+        abstract public void SetColumnWidths(List<float> widths);
+
+        protected void BaseRedraw(List<List<TextRef>> info, int numberOfCol)
+        {
+            for (int i = go.transform.childCount - 1; i >= 0; i--)      // Kill all previous lines
+            {
+                UnityEngine.Object.Destroy(go.transform.GetChild(i).gameObject);
+                go.transform.GetChild(i).SetParent(null);
+            }
+            if (title != null)
+            {
+                CreateTitle();
+            }
+            if (info.Count == 0)        // no data - place a dummy line
+            {
+                GameObject line = CreateLine();
+                for (int i = 0; i < numberOfCol; i++)
+                {
+                    GameObject dataCont = new GameObject("Data Container", typeof(RectTransform));
+                    dataCont.transform.SetParent(line.transform);
+                    TextBox data = new TextBox(dataCont.transform, TextRef.Create("#####", false), fontSize, i == 0 ? TextAnchor.MiddleLeft : TextAnchor.MiddleRight);
+                    if (i == 0) dataCont.AddComponent<LayoutElement>().flexibleWidth = 1;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < info.Count; i++)
+                {
+                    GameObject line = CreateLine();
+                    for (int j = 0; j < numberOfCol; j++)
+                    {
+                        GameObject dataCont = new GameObject("Data Container", typeof(RectTransform));
+                        dataCont.transform.SetParent(line.transform);
+                        dataCont.AddComponent<LayoutElement>();
+                        if (widths == null)
+                            ((RectTransform)dataCont.transform).sizeDelta = new Vector2(((RectTransform)line.transform.parent).rect.width / numberOfCol, 50);
+                        else
+                        {
+                            ((RectTransform)dataCont.transform).sizeDelta = new Vector2(widths[j], fontSize + 4);
+                            dataCont.GetComponent<LayoutElement>().preferredWidth = widths[j];
+                        }
+                        TextBox data = new TextBox(dataCont.transform, info[i][j], fontSize, j == 0 ? TextAnchor.MiddleLeft : TextAnchor.MiddleRight);
+                        if (j == 0) dataCont.GetComponent<LayoutElement>().flexibleWidth = 1;
+                    }
+                }
+            }
+        }
+
         private void CreateTitle()
         {
             TextBox titleTxt = new TextBox(go.transform, TextRef.Create(title), (int)(fontSize * 1.2f), TextAnchor.MiddleCenter);
@@ -170,6 +223,11 @@ namespace QuintensUITools
             }
         }
 
+        /// <summary>
+        /// Retrieve the highlighted line of a table where highlighting is enabled
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T RetrieveHighlight<T>()
         {
             if (GetType() == typeof(MultiColumnPassiveMemory<T>))
@@ -208,46 +266,10 @@ namespace QuintensUITools
 
         abstract public void ResetInfo();
 
-        protected void BaseRedraw(List<List<TextRef>> info, int numberOfCol)
-        {
-            for (int i = go.transform.childCount - 1; i >= 0; i--)      // Kill all previous lines
-            {
-                UnityEngine.Object.Destroy(go.transform.GetChild(i).gameObject);
-                go.transform.GetChild(i).SetParent(null);
-            }
-            if (title != null)
-            {
-                CreateTitle();
-            }
-            if (info.Count == 0)        // no data - place a dummy line
-            {
-                GameObject line = CreateLine();
-                for (int i = 0; i < numberOfCol; i++)
-                {
-                    GameObject dataCont = new GameObject("Data Container", typeof(RectTransform));
-                    dataCont.transform.SetParent(line.transform);
-                    TextBox data = new TextBox(dataCont.transform, TextRef.Create("#####", false), fontSize, i == 0 ? TextAnchor.MiddleLeft : TextAnchor.MiddleRight);
-                    if (i == 0) dataCont.AddComponent<LayoutElement>().flexibleWidth = 1;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < info.Count; i++)
-                {
-                    GameObject line = CreateLine();
-                    for (int j = 0; j < numberOfCol; j++)
-                    {
-                        GameObject dataCont = new GameObject("Data Container", typeof(RectTransform));
-                        dataCont.transform.SetParent(line.transform);
-                        ((RectTransform)dataCont.transform).sizeDelta = new Vector2(((RectTransform)line.transform.parent).rect.width / numberOfCol, 50);
-                        TextBox data = new TextBox(dataCont.transform, info[i][j], fontSize, j == 0 ? TextAnchor.MiddleLeft : TextAnchor.MiddleRight);
-                        dataCont.AddComponent<LayoutElement>();
-                        if (j == 0) dataCont.GetComponent<LayoutElement>().flexibleWidth = 1;
-                    }
-                }
-            }
-        }
 
+        /// <summary>
+        /// The monobehaviour component of the InfoTable class. Please don't touch this.
+        /// </summary>
         public class ActiveInfoTable : MonoBehaviour
         {
             public InfoTable parent;
@@ -320,6 +342,13 @@ namespace QuintensUITools
                 else if (headers != null)
                     throw new ArgumentException("The headers of this infotable do not have a valid count. Use 'number of colums' or 'number of colums + 1'");
             }
+
+            public override void SetColumnWidths(List<float> widths)
+            {
+                if (widths.Count != info[0].Count)
+                    throw new ArgumentException("The amount of widths should be equal to the number of columns");
+                this.widths = widths;
+            }
         }
 
         class MultiColumnPassiveMemory<T> : InfoTable
@@ -329,7 +358,7 @@ namespace QuintensUITools
             int colms;
 
             /// <summary>
-            /// Use this constructor if you want to make a 2 column table where the number of elements is fixed
+            /// Use this constructor if you want to make a multi column table where the number of elements is fixed
             /// </summary>
             /// <param name="parent"></param>
             /// <param name="info">The tuples in this list are the entries. The second item is the ToString() of whatever object is returned by the second function.</param>
@@ -388,6 +417,13 @@ namespace QuintensUITools
             {
                 return dataList[highlightedLine.transform.GetSiblingIndex() - (headers == null ? 0 : 1)];
             }
+
+            public override void SetColumnWidths(List<float> widths)
+            {
+                if (widths.Count != info[0].Count)
+                    throw new ArgumentException("The amount of widths should be equal to the number of columns");
+                this.widths = widths;
+            }
         }
 
         class MultiColumnActive : InfoTable
@@ -419,8 +455,10 @@ namespace QuintensUITools
             public override void Redraw()
             {
                 List<List<TextRef>> newinfo = script();
-                if (newinfo == null || newinfo.Count == 0)
+                if (newinfo == null)
                     throw new ArgumentException("The info of this infotable is empty. Please don't do this to me.");
+                if (newinfo.Count == 0)
+                    throw new ArgumentException("The infotable is empty. Make sure there is information to display or that there is a header.");
                 colms = newinfo[0].Count;
                 for (int i = 1; i < newinfo.Count; i++)
                     if (newinfo[i].Count != colms)
@@ -459,6 +497,13 @@ namespace QuintensUITools
                 else if (headers != null)
                     throw new ArgumentException("The headers of this infotable do not have a valid count. Use 'number of colums' or 'number of colums + 1'");
             }
+
+            public override void SetColumnWidths(List<float> widths)
+            {
+                if (widths.Count != colms)
+                    throw new ArgumentException("The amount of widths should be equal to the number of columns");
+                this.widths = widths;
+            }
         }
 
         class MultiColumnActiveMemory<T> : InfoTable
@@ -493,8 +538,10 @@ namespace QuintensUITools
             public override void Redraw()
             {
                 List<T> newList = listScript();
-                if (newList == null || (newList.Count == 0 && headers == null))
+                if (newList == null)
                     throw new ArgumentException("The info of this infotable is empty. Please don't do this to me.");
+                if ((newList.Count == 0 && headers == null))
+                    throw new ArgumentException("The infotable is empty. Make sure there is information to display or that there is a header.");
                 bool dataEqual = true;
                 if (dataList == null || newList == null) dataEqual = false;
                 else if (dataList.Count != newList.Count) dataEqual = false;
@@ -531,8 +578,15 @@ namespace QuintensUITools
                 if (highlightLines == false)
                     throw new InvalidOperationException("This list does not have highlights.");
                 if (highlightedLine != null)
-                    return dataList[highlightedLine.transform.GetSiblingIndex() - (headers == null ? 0 : 1)];
+                    return dataList[highlightedLine.transform.GetSiblingIndex() - (headers == null ? 0 : 1) - (title == null ? 0 : 1)];
                 return default(T);
+            }
+
+            public override void SetColumnWidths(List<float> widths)
+            {
+                if (widths.Count != colms)
+                    throw new ArgumentException("The amount of widths should be equal to the number of columns");
+                this.widths = widths;
             }
         }
     }

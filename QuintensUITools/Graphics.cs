@@ -48,6 +48,7 @@ namespace QuintensUITools
                 dict.Add(Path.GetFileNameWithoutExtension(allPaths[i]), t);
             }
             Debug.Log("Loaded " + allPaths.Length + " graphics.");
+            MouseOver.Create();
         }
 
         /// <summary>

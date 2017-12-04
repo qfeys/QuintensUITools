@@ -67,13 +67,13 @@ namespace QuintensUITools
                 text.color = color ?? Graphics.Color_.text;
 
                 tr.localScale = new Vector3(1f / SCALING_FACTOR, 1f / SCALING_FACTOR, 1);
-                tr.sizeDelta = new Vector2(text.preferredWidth / SCALING_FACTOR + size, (size + 2));
+                tr.sizeDelta = new Vector2(text.preferredWidth / SCALING_FACTOR + size, (size + 2)) * SCALING_FACTOR;
 
             }
             else                        // Make a button
             {
                 Image img = go.AddComponent<Image>();
-                img.sprite = Graphics.GetSprite("tab_image_low");
+                img.sprite = Graphics.GetSprite("tb_button_bg");
                 img.type = Image.Type.Sliced;
                 Button but = go.AddComponent<Button>();
                 but.onClick.AddListener(() => Text.link());
@@ -138,7 +138,7 @@ namespace QuintensUITools
         {
             public TextBox parent;
             public bool hasMouseover = false;
-            bool mouseActive = false;
+            public bool mouseActive = false;
             public float mouseTimeActive = 0;
 
             private void Update()
@@ -146,8 +146,8 @@ namespace QuintensUITools
                 parent.Update();
                 if (hasMouseover && mouseActive)
                 {
-                    mouseTimeActive += Time.deltaTime;
-                    if (mouseTimeActive > MOUSE_OVER_DISPLAY_TRESHOLD)
+                    mouseTimeActive += Time.unscaledDeltaTime;
+                    if (mouseTimeActive >= MOUSE_OVER_DISPLAY_TRESHOLD)
                     {
                         MouseOver.Activate(parent.Text.AltText);
                     }
@@ -436,13 +436,13 @@ namespace QuintensUITools
             if (d == null) return "INVALID";
             Type t = d.GetType();
             if (t == typeof(double))
-                return ToSI((double)d, "0.##");
+                return ToSI((double)d);
             else if (t == typeof(float))
-                return ToSI((float)d, "0.##");
+                return ToSI((float)d);
             else if (t == typeof(int))
-                return ToSI((int)d, "0.##");
+                return ToSI((int)d);
             else if (t == typeof(long))
-                return ToSI((long)d, "0.##");
+                return ToSI((long)d);
             else
                 return d.ToString();
         }
@@ -472,9 +472,9 @@ namespace QuintensUITools
         /// <param name="d"></param>
         /// <param name="format"></param>
         /// <returns></returns>
-        static string ToSI(double d, string format = null)
+        static public string ToSI(double d, string format = null)
         {
-            if (d == 0 || (d >= 0.1 && d < 10000)) return d.ToString(format);
+            if (d == 0 || (d >= 0.1 && d < 10000)) return d.ToString(format ?? (d < 10 ? "0.##" : "0.#"));
 
             char[] incPrefixes = new[] { 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
             char[] decPrefixes = new[] { 'm', '\u03bc', 'n', 'p', 'f', 'a', 'z', 'y' };
@@ -489,6 +489,11 @@ namespace QuintensUITools
             {
             case 1: prefix = incPrefixes[degree - 1]; break;
             case -1: prefix = decPrefixes[-degree - 1]; break;
+            }
+
+            if(format == null)
+            {
+                format = scaled < 10 ? "0.##" : "0.#";
             }
 
             return scaled.ToString(format) + prefix;
